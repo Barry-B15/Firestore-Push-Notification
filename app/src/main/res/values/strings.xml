@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">FirebasePushNotificationDemo</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="profile_view">Profile</string>
+    <string name="users_view">Users</string>
+    <string name="notif_view">Notifications</string>
+    <string name="welcome_msg">Welcome To Zini App</string>
+    <string name="et_email">Enter Email Address</string>
+    <string name="et_password">Enter Password</string>
+    <string name="save">Save</string>
+    <string name="login_text">Login to your account</string>
+    <string name="goto_reg_text">Don\'t have an account? Register here!</string>
+    <string name="goto_login">Already have an account? Login here!</string>
+    <string name="register_name">Enter user name</string>
+    <string name="register_text">Register your account</string>
+    <string name="logout">Logout the Account</string>
+    <string name="user_name">User name</string>
+    <string name="status">Enter status</string>
+    <string name="send_text_view">Send To : </string>
+    <string name="send_button">Send</string>
+    <string name="send_hint">Enter Notification Message</string>
+</resources>

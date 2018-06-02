@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/fragment_profile"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
+    android:background="@drawable/custom_lt_background"
+    tools:context=".ProfileFragment">
+
+    <!-- To hide keyboard until user needs it, take focus away from the EditText field to parent
+        android:id="@+id/fragment_profile"  // give the parent an id
+        android:descendantFocusability="beforeDescendants" // tell android to focus on the parent before descendants
+        android:focusableInTouchMode="true"  // focus the descendant only when touched/called
+
+        //then add this to the java code
+        // findViewById(R.id.fragment_profile).requestFocus();
+        -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="8dp"
+        android:background="@drawable/fragment_background">
+
+        <TextView
+            android:id="@+id/profile_header"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:padding="20dp"
+            android:text="@string/hello_blank_fragment" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profile_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="31dp"
+            android:layout_marginTop="65dp"
+            android:src="@mipmap/ic_launcher" />
+
+        <Button
+            android:id="@+id/profile_logout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/primary_color_btn"
+            android:text="@string/logout"
+            android:textAllCaps="false"
+            android:textColor="@color/white" />
+
+        <TextView
+            android:id="@+id/profile_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="76dp"
+            android:text="@string/user_name" />
+
+        <EditText
+            android:id="@+id/profile_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/profile_name"
+            android:layout_below="@+id/profile_name"
+            android:hint="@string/status"
+            android:focusable="auto"
+            android:inputType="text|textCapWords" />
+
+    </RelativeLayout>
+
+</FrameLayout>
