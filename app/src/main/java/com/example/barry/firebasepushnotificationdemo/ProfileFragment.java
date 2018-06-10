@@ -17,7 +17,11 @@ import com.example.barry.firebasepushnotificationdemo.account.LoginActivity;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -114,10 +118,35 @@ private EditText mProfileStatus;
             @Override
             public void onClick(View view) {
 
+                /*
+                // for Notifications, move this codes in to the onSuccessListener below
                 mAuth.signOut();
-
                 Intent loginIntent = new Intent(container.getContext(), LoginActivity.class);
                 startActivity(loginIntent);
+                */
+
+                //NNNNNNNNNNNNNNNNNNNNNNNN NOTIFICATIONS Remove token NNNNNNNNNNNNNNNNN
+                // VIDEO 4
+                // create a hashmap for the token
+                Map<String, Object> tokenMapRemove = new HashMap<>();
+                //tokenMapRemove.put("token_id", "");  // this sets the token id to blank (token_id = "")
+                tokenMapRemove.put("token_id", FieldValue.delete()); // this deletes the token id
+
+                mFirestore.collection("Users")
+                        .document(mUserId)
+                        .update(tokenMapRemove)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+
+                                mAuth.signOut();
+                                Intent loginIntent = new Intent(container.getContext(), LoginActivity.class);
+                                startActivity(loginIntent);
+                            }
+                        }); //NOW RUN
+                //NNNNNNNNNNNNNNNNNNNNNNNN NOTIFICATIONS EndNNNNNNNNNNNNNNNNN
+
+
             }
         });
         return view;

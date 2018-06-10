@@ -15,11 +15,13 @@ import android.widget.Toast;
 import com.example.barry.firebasepushnotificationdemo.MainActivity;
 import com.example.barry.firebasepushnotificationdemo.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -33,16 +35,16 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * 2. add click listener to the image btn
  * 3. override onActivityResult
  * 4. def a uri to store the image
- *      - init it to null in onCreate
- *      - get the data in onActivityResult
- *      - set the to the btn to display
+ * - init it to null in onCreate
+ * - get the data in onActivityResult
+ * - set the to the btn to display
  * 5. add listener to the register btn
- *      In a real app, do image handling in a separate activity
+ * In a real app, do image handling in a separate activity
  * 6. Add Firebase Storage
- *      declare and init the Storage ref
- *
+ * declare and init the Storage ref
+ * <p>
  * 7. Add the Firebase Firtestore and the Auth
- *      Init both also
+ * Init both also
  */
 public class RegistrationActivity extends AppCompatActivity {
 
@@ -115,25 +117,27 @@ public class RegistrationActivity extends AppCompatActivity {
                             && !TextUtils.isEmpty(password)) {
                         mAuth.createUserWithEmailAndPassword(email, password)
                                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<AuthResult> task) {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
 
-                                        if (task.isSuccessful()) {
+                                    // for final app, send a user to the setup activity
+                                    // store the user data in string
+                                    final String user_id = mAuth.getCurrentUser().getUid();
+                                    StorageReference user_profile = mStorage.child(user_id + ".jpg");
 
-                                            // for final app, send a user to the setup activity
-                                            // store the user data in string
-                                            final String user_id = mAuth.getCurrentUser().getUid();
-                                            StorageReference user_profile = mStorage.child(user_id + ".jpg");
+                                    user_profile.putFile(imageUri)
+                                            .addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> uploadTask) {
+                                            if (uploadTask.isSuccessful()) {
 
-                                            user_profile.putFile(imageUri)
-                                                    .addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> uploadTask) {
+                                                final String download_url = uploadTask.getResult().getDownloadUrl().toString();
 
-                                                    if (uploadTask.isSuccessful()) {
-
-                                                        String download_url = uploadTask.getResult().getDownloadUrl().toString();
-
+                                                //NNNNNNNNNNNNNNNNNNNNNNNN NOTIFICATIONS EndNNNNNNNNNNNNNNNNN
+                                                // VIDEO 4
+                                                /* For notifications
+                                                        create and move this old code into the new onSuccessListener below
                                                         Map<String, Object> userMap = new HashMap<>();
                                                         userMap.put("name", name);
                                                         userMap.put("image", download_url);
@@ -151,30 +155,65 @@ public class RegistrationActivity extends AppCompatActivity {
                                                                         // if success
                                                                         sendToMain();
                                                                     }
-                                                                });
-                                                    } else {
-                                                        Toast.makeText(RegistrationActivity.this,
-                                                                "Error : " + uploadTask.getException().getMessage(),
-                                                                Toast.LENGTH_SHORT).show();
+                                                                });*/
 
-                                                        // hide progress
-                                                        mRegProgressBar.setVisibility(View.INVISIBLE);
-                                                    }
+
+                                                String token_id = FirebaseInstanceId.getInstance().getToken(); //getTokenId using firebase instance id;
+
+                                                Map<String, Object> userMap = new HashMap<>();
+                                                userMap.put("name", name);
+                                                userMap.put("image", download_url);
+                                                userMap.put("token_id", token_id);
+
+                                                mFirestore.collection("Users")
+                                                        .document(user_id)
+                                                        .set(userMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+
+                                                                // hide progress
+                                                                mRegProgressBar.setVisibility(View.INVISIBLE);
+
+                                                                // if success
+                                                                sendToMain();
+                                                                }
+                                                        }).addOnFailureListener(new OnFailureListener() {
+                                                            @Override
+                                                            public void onFailure(@NonNull Exception e) {
+
+                                                                Toast.makeText(RegistrationActivity.this,
+                                                                        "Error : " + e.getMessage(),
+                                                                        Toast.LENGTH_SHORT).show();
+                                                                mRegProgressBar.setVisibility(View.INVISIBLE);
+                                                                }
+                                                        });
+
                                                 }
-                                            });
 
-                                        } else {
-                                            Toast.makeText(RegistrationActivity.this,
-                                                    "Error : " + task.getException().getMessage(),
-                                                    Toast.LENGTH_SHORT).show();
+                                                // Now go back to edit the index.js file in
+                                            // Functions in FirebasePushNotifications on Desktop
+                                            //NNNNNNNNNNNNNNNNNNNNNNNN NOTIFICATIONS EndNNNNNNNNNNNNNNNNN
+                                            else {
+                                                Toast.makeText(RegistrationActivity.this,
+                                                        "Error : " + uploadTask.getException().getMessage(),
+                                                        Toast.LENGTH_SHORT).show();
 
-                                            // hide progress
-                                            mRegProgressBar.setVisibility(View.INVISIBLE);
+                                                // hide progress
+                                                mRegProgressBar.setVisibility(View.INVISIBLE);
+                                                }
                                         }
+                                    });
+                                }
+                                else {
+                                    Toast.makeText(RegistrationActivity.this,
+                                            "Error : " + task.getException().getMessage(),
+                                            Toast.LENGTH_SHORT).show();
+
+                                    // hide progress
+                                    mRegProgressBar.setVisibility(View.INVISIBLE);
                                     }
-                                });
-
-
+                            }
+                        });
                     }
                 }
             }

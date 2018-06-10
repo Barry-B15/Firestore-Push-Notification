@@ -69,7 +69,7 @@ import com.google.firebase.auth.FirebaseUser;
  * RUN
  *
  * ----------------------------------------------
- * To Send Notifications, we 1st store that in Firebase,
+ * To Send Notifications, 1st STORE DATA TO FIRESTORE
  * then from there we use the cloud func to push it to the devices
  *
  *  IN SEND ACTIVITY
@@ -89,9 +89,151 @@ import com.google.firebase.auth.FirebaseUser;
  *      pass in the user name in the adapter (easier) with the intent
  *      then assign it in the Send activity
  *
+ *---------------------------------------------------------
+ * SEND NOTIFICATION; SEND TO USERS
+ * Video 4: https://youtu.be/Abh3r9hh5gw?list=PLGCjwl1RrtcRHjHyZAxm_Mq4qvtnundo0
  *
+ * PPPPPPPPPPPP PREPARE THE CLOUD USAGE PPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+ * 1. In firebase, left panel we see "(--) Functions"
+ *      we are going to use that to write functions to send notification
+ *      to use firebase cloud function, we need NPM node .js to write the functions
+ *      so go to npmjs.com to download and install
+ *      make sure you install Node with npm (I have this already from another app)
  *
+ * 2. click functions in firebase, > get started > see this:
+ *          $ npm install -g firebase-tools
+ *          copy without the $
  *
+ * 3. open the pc window power shell > paste : npm install -g firebase-tools > enter
+ *      This will install the firebase tool for npm
+ *
+ * 4. Back to Firebase > Function Dashboard > Continue > Finish
+ *
+ * 5. Create a folder FirebasePushNotification on Desktop
+ *
+ * 6.. In the Shell, change dir to the file just created, just type in:
+ *      cd/Users/barry/Desktop  Enter (this changes to the Desktop)
+ *      cd/FirebasePushNotif    Enter (this takes us into the new file)
+ *
+ * 7.  C:/Users/barry/Desktop/FirebasePushNotif > firebase login  (login to firebase)
+ *          this will show Already logged in and the email address since I am logged in
+ *      - continue the new line with
+ *          firebase init functions   ## this helped to create the 3 folders, saw from another video
+ *          XX# firebase init      Enter (to init firebase) ### This didn't create the functions folder
+ *
+         *  Follow thru the leads
+         *   This gave me an option to cont (Y/N)
+         *   - type in Y Enter
+         *   Also to add dependencies, Y and cont
+         *
+         *   This shows firebase options to choose from,
+         *   use the arrow key > move to
+         *      Functions: Configure and deploy > Enter
+         *
+         *   It shows a list of my FB projects to choose from
+         *   Use the arrow to move down to the needed project
+         *      FirebasePushNotificationDemo > Enter
+         *
+         *  Initialization completed
+         *  It didn't give me the option to select what language to like in the video
+         *  Hope it works (could this be from my installation or from my past usages
+ *
+ * 8. open the FirebasePushNotif folder on desktop (3 files inside)
+ *      open the functions folder (3 files , 1 folder auto created )
+ *      open index.js with a text editor to add our functions
+ *      add the following code
+ *
+ *      'use-strict'
+ *
+ *      const functions = require('firebase-functions');
+ *      const admin = require('firebase-admin');
+ *
+ *      // where to export the notif: firestore document Users with user id and notif id
+  *       exports.sendNotification = functions.firestore.document("Users/{user_id}/Notifications/{notification_id}").onWrite(event=> {
+  *
+         // create 2 var for the above func
+ *      const user_id = event.params.user_id;
+ *       const notification_id = event.params.notification_id;
+ *
+ *       // log to console
+ *      console.log("User ID : " + user_id + " | Notification ID : " + notification_id);
+ *
+ *      });
+ *
+ * 9. Deploy to firebase: To deploy
+ *      Go back to the Shell, make sure you are still in the same folder
+ *      Type in:
+ *          firebase deploy enter  OR
+ *          (firebase deploy --only functions) enter
+ *
+     *  It will take like 5 mins, so wait. when done you will see
+     *  Deploy completed
+ *
+ * 10. Now go to firebase Functions Dashboard to see that sendNotification has been added
+ *
+ * 11. Send a notification > open the Log > see the log
+ *
+ *  PPPPPPPPPPPP PREPARE THE CLOUD USAGE END PPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+ *
+ * Firebase only sends notifications to specific groups (which you have to subscribe to),
+ *          devices, or a device token id, not to user IDs
+ *
+ * To send to a single person we need a token id, lets try to do that
+ * 1. Go to the Login page, login btn
+ *      Edit to update the user data with a token id
+ *
+ * 2. Go to Profile fragment imediately after logout to remove this token when user logs out
+ *
+ * 3. When someone creates a new account, lets also set a token so we can send them notif
+ *  Go to Registration() class, add the token_id to the hash map
+ *
+ * 4. Now go back to edit the index.js file in
+ *  Functions in FirebasePushNotifications on Desktop
+ *  deploy and test
+ *
+ * 5. Add payload to actually send the notif
+ *      - add firebase-messaging dependency to gradle or the messages wont get sent
+ *
+ * ---------------------------------------------------------
+ * Video 5: Send notif in foreground
+ * https://youtu.be/sQez4bRDmEg?list=PLGCjwl1RrtcRHjHyZAxm_Mq4qvtnundo0
+ *
+ * 1. Create a new java class FirebaseMessagingService .
+ *      we need the firebase messaging srvice to send notif to users
+ *      - have the class extend FirebaseMesssagingService
+ *
+ * 2. add this to manifest,
+ *
+ *      <service
+ *          android: name = ".FirebaseMessagingService" >
+ *          <intent-filter>
+ *              <action android: name = "com.google.firebase.MESSAGING_EVENT" />
+ *          </ intent-filter>
+ *      </ service>
+ * doc at:
+ * https://firebase.google.com/docs/cloud-messaging/android/client?hl=ja
+
+3. aDD  the messaging dependecy to gradle if you havent done that already
+
+ 4. For more complicated app
+ *  consider using the .MyFirebaseInstanceIDService in the manifest Vs our method
+ *  using token in Registration and Login class as we did before in this video
+ *  of course thats just another approach
+ *  See doc:
+ *  https://firebase.google.com/docs/cloud-messaging/android/client?hl=ja
+ *
+ *  RUN AFTER COMPLETING CODE IN FirebaseMessagingService
+ *  (Server side seems okay but I'm not getting the notification on device)
+ *
+ * 5. Create a new NotificationActivity to display the notifs
+ *
+ * ---------------------------------------------------------------
+ * SHOWING LIST OF NOTIFICATIONS
+ * similar to what we did with the users
+ * 1. create a recycler view to the fragment_notification xml file
+ * 2. Create a "single_notification" layout to handle single notifications
+ * 3. create a model class "Notifications"
+ * 4. create a "Notifications Adapter" class
  *
  */
 public class MainActivity extends AppCompatActivity {

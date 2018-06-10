@@ -1,8 +1,8 @@
 package com.example.barry.firebasepushnotificationdemo;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SendActivity extends AppCompatActivity {
+
+    //private static final String CHANNEL_ID = "personal_notifications";  // Added from Prabeesh
 
     private TextView user_id_view;
 
@@ -109,5 +111,24 @@ public class SendActivity extends AppCompatActivity {
                 }
             }
         });
+
+       // createNotificationChannel();  // Added from Prabeesh
     }
+
+    /*//This video says we need to create channels for notif to work in android version 8+
+    // https://youtu.be/Qo2IxY9eDhw
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.O) {
+            CharSequence name = "Personal Notifications";
+            String description = "Include all the personal notifications";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+
+            NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID, name, importance);
+
+            notificationChannel.setDescription(description);
+
+            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+    }*/
 }

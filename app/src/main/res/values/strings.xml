@@ -21,4 +21,9 @@
     <string name="send_text_view">Send To : </string>
     <string name="send_button">Send</string>
     <string name="send_hint">Enter Notification Message</string>
+
+    <string name="default_notification_channel_id">Zini_CH_01</string>
+    <string name="channel_name">Zini_NOTIF</string>
+    <string name="notif_tv">Notice For You</string>
+    <string name="notif_massage">Message</string>
 </resources>
